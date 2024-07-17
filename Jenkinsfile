@@ -14,11 +14,17 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'  // Adjust as per your project's dependency management
-            }
+       stage('Install Dependencies') {
+    steps {
+        script {
+            // Activate Node.js version using nvm
+            sh 'nvm use 14.17.0'
+            // Install npm dependencies
+            sh 'npm install'
         }
+    }
+}
+
 
         stage('Build Artifacts') {
             steps {
