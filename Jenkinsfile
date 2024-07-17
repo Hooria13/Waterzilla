@@ -2,87 +2,103 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = 'docker.io'
-        IMAGE_NAME = 'Alpine'
-        VERSION = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
+        DOCKER_IMAGE = "Hooria13/nodejs-project"
+        DOCKER_REGISTRY_CREDENTIALS_ID = 'docker-cred'
+        GIT_REPO = 'https://github.com/Hooria13/Waterzilla.git'
+        GIT_CREDENTIALS_ID = 'Git-Credentials13'
     }
 
     stages {
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/Hooria13/Waterzilla.git'
+                git branch: 'master', credentialsId: "${GIT_CREDENTIALS_ID}", url: "${GIT_REPO}"
             }
         }
 
-       stage('Install Dependencies') {
-    steps {
-        script {
-            // Activate Node.js version using nvm
-            sh 'nvm use 14.17.0'
-            // Install npm dependencies
-            sh 'npm install'
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
         }
-    }
-}
-
 
         stage('Build Artifacts') {
             steps {
-                sh 'npm run build'  // Adjust as per your project's build process
-            }
-            post {
-                success {
-                    archiveArtifacts artifacts: '**/build/**', allowEmptyArchive: true
-                }
+                sh 'your-command-to-build-artifacts'
+                archiveArtifacts artifacts: '**/your-artifacts*', allowEmptyArchive: true
             }
         }
 
-        stage('Create Docker Image') {
+      
+        stage('Create Dockerfile') {
             steps {
                 script {
-                    docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:${VERSION}", "-f Dockerfile.alpine .")
-                    docker.withRegistry('', 'docker-credentials13') {
-                        dockerImage.push()
-                    }
+                    writeFile file: 'Dockerfile', text: """
+                    FROM node:14-alpine
+                    WORKDIR /app
+                    COPY package.json ./
+                    COPY package-lock.json ./
+                    RUN npm install
+                    COPY . .
+                    CMD ["node", "index.js"]
+                    """
                 }
             }
         }
 
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}:${env.BUILD_ID}")
+                }
+            }
+        }
+
+       
         stage('Scan Docker Image') {
             steps {
                 script {
-                    def report = docker.image("${DOCKER_REGISTRY}/${IMAGE_NAME}:${VERSION}").securityChecker()
-                    writeFile file: 'docker-image-report.txt', text: report
-                    echo 'Security vulnerabilities report:'
-                    echo report
+                    sh "trivy image ${DOCKER_IMAGE}:${env.BUILD_ID}"
                 }
             }
         }
 
-        stage('Upload Docker Image') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry("${DOCKER_REGISTRY}", 'docker-credentials13') {
-                        dockerImage.push("${VERSION}")
+                    docker.withRegistry('', "${DOCKER_REGISTRY_CREDENTIALS_ID}") {
+                        docker.image("${DOCKER_IMAGE}:${env.BUILD_ID}").push()
                     }
                 }
             }
         }
 
-        stage('Create Docker Compose File and Deploy') {
+        stage('Generate Report') {
+            steps {
+                sh 'your-command-to-generate-report'
+                archiveArtifacts artifacts: '**/your-report*', allowEmptyArchive: true
+            }
+        }
+
+        stage('Deploy with Docker Compose') {
             steps {
                 script {
                     writeFile file: 'docker-compose.yml', text: """
-                        version: '3'
-                        services:
-                            ${IMAGE_NAME}:
-                                image: ${DOCKER_REGISTRY}/${IMAGE_NAME}:${VERSION}
-                                ports:
-                                    - '80:8080'  # Adjust port mapping as per your application needs
+                    version: '3.8'
+                    services:
+                      app:
+                        image: ${DOCKER_IMAGE}:${env.BUILD_ID}
+                        ports:
+                          - "8080:8080"
                     """
+                    }
                     sh 'docker-compose up -d'
                 }
             }
+        }
+    }
+    post {
+        always {
+            cleanWs()
         }
     }
 }
