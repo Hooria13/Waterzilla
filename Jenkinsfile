@@ -1,11 +1,11 @@
 pipeline {
     agent any
 
-    //environment {
-      //  DOCKER_REGISTRY = 'your-docker-registry-url'
-        //IMAGE_NAME = 'your-image-name'
-        //VERSION = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
-    //}
+    environment {
+        DOCKER_REGISTRY = 'docker.io'
+        IMAGE_NAME = 'Alpine'
+        VERSION = sh(returnStdout: true, script: 'echo $BUILD_NUMBER').trim()
+    }
 
     stages {
         stage('Clone Repository') {
@@ -35,7 +35,7 @@ pipeline {
             steps {
                 script {
                     docker.build("${DOCKER_REGISTRY}/${IMAGE_NAME}:${VERSION}", "-f Dockerfile.alpine .")
-                    docker.withRegistry('', 'docker-credentials-id') {
+                    docker.withRegistry('', 'docker-credentials13') {
                         dockerImage.push()
                     }
                 }
@@ -56,7 +56,7 @@ pipeline {
         stage('Upload Docker Image') {
             steps {
                 script {
-                    docker.withRegistry("${DOCKER_REGISTRY}", 'docker-credentials-id') {
+                    docker.withRegistry("${DOCKER_REGISTRY}", 'docker-credentials13') {
                         dockerImage.push("${VERSION}")
                     }
                 }
