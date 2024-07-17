@@ -16,7 +16,7 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'cd Waterzilla && npm install'  // Adjust as per your project's dependency management
+                sh 'npm install'  // Adjust as per your project's dependency management
             }
         }
 
