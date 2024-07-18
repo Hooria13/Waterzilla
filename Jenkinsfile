@@ -42,8 +42,8 @@ pipeline {
                     writeFile file: 'Dockerfile', text: """
                     FROM node:14-alpine
                     WORKDIR /app
-                    COPY package.json ./
-                    COPY package-lock.json ./
+                    COPY server/package.json ./
+                    COPY server/package-lock.json ./
                     RUN npm install
                     COPY . .
                     CMD ["node", "index.js"]
