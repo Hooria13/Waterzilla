@@ -12,12 +12,15 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 git branch: 'master', credentialsId: "${GIT_CREDENTIALS_ID}", url: "${GIT_REPO}"
+                sh 'ls -la Hooria13/Waterzilla/server/routes'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh 'npm install'
+                dir('Hooria13/Waterzilla/server/routes') {
+                    sh 'npm install'
+                }
             }
         }
 
