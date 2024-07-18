@@ -24,11 +24,13 @@ pipeline {
                 }
             }
         }
-        stage('Build Artifacts') {
+
+         stage('Create Source Code Archive') {
             steps {
-                dir('server'){
-                    sh 'npm run build'
-                archiveArtifacts artifacts: '**/your-artifacts*', allowEmptyArchive: true
+                dir('server') {
+                    // Zip the entire project directory
+                    sh 'zip -r project-source.zip .'
+                    archiveArtifacts artifacts: 'project-source.zip', allowEmptyArchive: true
                 }
             }
         }
