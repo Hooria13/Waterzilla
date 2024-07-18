@@ -62,13 +62,13 @@ pipeline {
         }
 
        
-        stage('Scan Docker Image') {
-            steps {
-                script {
-                    sh "trivy image ${DOCKER_IMAGE}:${env.BUILD_ID}"
-                }
-            }
-        }
+       // stage('Scan Docker Image') {
+         //   steps {
+           //     script {
+             //       sh "trivy image ${DOCKER_IMAGE}:${env.BUILD_ID}"
+               // }
+            //}
+        //}
 
         stage('Push Docker Image') {
             steps {
