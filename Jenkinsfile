@@ -101,7 +101,7 @@ pipeline {
             steps {
                 script {
                     writeFile file: 'docker-compose.yml', text: """
-                    version: '3.8'
+                    version: '2.29'
                     services:
                       app:
                         image: ${DOCKER_IMAGE}:${env.BUILD_ID}
