@@ -26,8 +26,10 @@ pipeline {
         }
         stage('Build Artifacts') {
             steps {
-                sh 'your-command-to-build-artifacts'
+                dir('server'){
+                    sh 'npm run build'
                 archiveArtifacts artifacts: '**/your-artifacts*', allowEmptyArchive: true
+                }
             }
         }
 
