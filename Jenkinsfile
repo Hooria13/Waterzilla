@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "Hooria13/nodejs-project"
-        DOCKER_REGISTRY_CREDENTIALS_ID = 'docker-cred'
+        DOCKER_REGISTRY_CREDENTIALS_ID = 'docker-credentials'
         GIT_REPO = 'https://github.com/Hooria13/Waterzilla.git'
         GIT_CREDENTIALS_ID = 'Git-Credentials13'
     }
