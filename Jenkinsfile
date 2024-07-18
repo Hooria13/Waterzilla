@@ -13,20 +13,17 @@ pipeline {
             steps {
                 git branch: 'master', credentialsId: "${GIT_CREDENTIALS_ID}", url: "${GIT_REPO}"
                 sh 'ls -la'
-                sh 'ls -la Hooria13'
-                sh 'ls -la Hooria13/Waterzilla'
-                sh 'ls -la Hooria13/Waterzilla/server'
+                sh 'ls -la server'
             }
         }
 
-        stage('Install Dependencies') {
+       stage('Install Dependencies') {
             steps {
-                dir('Hooria13/Waterzilla/server') {
+                dir('server') {
                     sh 'npm install'
                 }
             }
         }
-
         stage('Build Artifacts') {
             steps {
                 sh 'your-command-to-build-artifacts'
