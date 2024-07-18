@@ -88,10 +88,8 @@ pipeline {
 
         stage('Generate Report') {
     steps {
-        // Assuming Trivy generates JSON report, adjust the command based on actual tool and format
         sh 'trivy --format json --output trivy-report.json ${DOCKER_IMAGE}:${env.BUILD_ID}'
         
-        // Archive the vulnerability report as an artifact
         archiveArtifacts artifacts: 'trivy-report.json', allowEmptyArchive: true
     }
 }
